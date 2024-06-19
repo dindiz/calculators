@@ -1,0 +1,38 @@
+import gradio as gr
+
+# Function to calculate total returns
+def calculate_returns(initial_investment, annual_dividend_yield, monthly_sip, expected_return, time_duration):
+    months = time_duration * 12
+    monthly_return = (1 + expected_return) ** (1 / 12) - 1
+    total_value = initial_investment
+    
+    for i in range(months):
+        total_value = (total_value + monthly_sip) * (1 + monthly_return)
+        total_value += total_value * (annual_dividend_yield / 12)  # Add monthly dividend yield
+    
+    return total_value
+
+# Gradio interface function
+def total_returns_calculator(initial_investment, annual_dividend_yield, monthly_sip, expected_return, time_duration):
+    annual_dividend_yield /= 100  # Convert percentage to decimal
+    expected_return /= 100  # Convert percentage to decimal
+    total_returns = calculate_returns(initial_investment, annual_dividend_yield, monthly_sip, expected_return, time_duration)
+    return f"Total Returns after {time_duration} years: {total_returns:.2f}"
+
+# Gradio interface setup
+inputs = [
+    gr.Number(label="Initial Investment Corpus"),
+    gr.Number(label="Annual Dividend Yield (%)"),
+    gr.Number(label="Monthly SIP Contribution"),
+    gr.Number(label="Expected Annual Return (%)"),
+    gr.Number(label="Time Duration (years)")
+]
+
+outputs = gr.Textbox(label="Total Returns")
+
+gr.Interface(
+    fn=total_returns_calculator, 
+    inputs=inputs, 
+    outputs=outputs, 
+    title="Total Returns Calculator"
+).launch()
